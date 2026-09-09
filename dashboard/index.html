@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Datawrapper API</title>
+    <link rel="preconnect" href="https://datawrapper.dwcdn.net" />
+    <style>
+      :root {
+        --ink: #17202a;
+        --muted: #5d6d7e;
+        --line: #d7e1e7;
+        --paper: #f5f7fa;
+        --panel: #ffffff;
+        --brand: #0f7b8f;
+        --brand-dark: #095c6d;
+        --accent: #e85d3f;
+        --good: #17845b;
+        --shadow: 0 18px 45px rgba(23, 32, 42, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        background: var(--paper);
+        color: var(--ink);
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 16px clamp(18px, 4vw, 54px);
+        background: var(--panel);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        background: var(--brand);
+        color: #fff;
+        font-weight: 900;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        margin-bottom: 2px;
+        font-size: clamp(1.05rem, 2vw, 1.35rem);
+      }
+
+      .brand p,
+      .muted {
+        color: var(--muted);
+      }
+
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--good);
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      main {
+        width: min(1380px, calc(100% - 32px));
+        margin: 22px auto 36px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr 0.85fr;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
+
+      .intro {
+        padding: clamp(22px, 4vw, 34px);
+      }
+
+      .eyebrow {
+        margin-bottom: 12px;
+        color: var(--brand);
+        font-size: 0.78rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .intro h2 {
+        max-width: 850px;
+        margin-bottom: 16px;
+        font-size: clamp(2.2rem, 6vw, 5rem);
+        line-height: 0.95;
+        letter-spacing: 0;
+      }
+
+      .intro p {
+        max-width: 760px;
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: clamp(1rem, 2vw, 1.13rem);
+        line-height: 1.55;
+      }
+
+      .flow {
+        display: grid;
+        gap: 10px;
+        padding: 18px;
+      }
+
+      .flow-step {
+        display: grid;
+        grid-template-columns: 38px 1fr;
+        gap: 12px;
+        align-items: start;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcfd;
+      }
+
+      .flow-step span {
+        display: grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #f3d8cf;
+        color: var(--accent);
+        font-weight: 900;
+      }
+
+      .flow-step h3 {
+        margin-bottom: 4px;
+        font-size: 0.98rem;
+      }
+
+      .flow-step p {
+        margin-bottom: 0;
+        color: var(--muted);
+        line-height: 1.4;
+        font-size: 0.9rem;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(360px, 0.68fr) minmax(560px, 1fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      .editor,
+      .chart {
+        padding: 16px;
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .panel-header h2 {
+        margin-bottom: 4px;
+        font-size: 1.12rem;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      button,
+      a.button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        border: 0;
+        border-radius: 8px;
+        padding: 0 13px;
+        background: var(--brand);
+        color: #fff;
+        font: inherit;
+        font-weight: 850;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      button:hover,
+      a.button:hover {
+        background: var(--brand-dark);
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      .secondary {
+        background: #e9eef2;
+        color: var(--ink);
+      }
+
+      .secondary:hover {
+        background: #dbe5eb;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 520px;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid var(--line);
+        padding: 10px;
+        text-align: left;
+        font-size: 0.9rem;
+      }
+
+      th {
+        background: #eef4f6;
+        color: #24444c;
+        font-size: 0.76rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      input {
+        width: 100%;
+        min-width: 0;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 9px 10px;
+        font: inherit;
+      }
+
+      input[type="number"] {
+        max-width: 110px;
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 14px 0;
+      }
+
+      .metric {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcfd;
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 1.45rem;
+      }
+
+      .metric span {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .message {
+        min-height: 22px;
+        margin: 12px 0 0;
+        color: var(--muted);
+        line-height: 1.35;
+        font-weight: 700;
+      }
+
+      .message.ok {
+        color: var(--good);
+      }
+
+      .message.error {
+        color: #b42318;
+      }
+
+      .frame-wrap {
+        min-height: 620px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        overflow: hidden;
+      }
+
+      iframe {
+        display: block;
+        width: 100%;
+        min-height: 620px;
+        border: 0;
+      }
+
+      code {
+        border-radius: 6px;
+        background: #eef3f5;
+        padding: 2px 5px;
+        color: #21434a;
+      }
+
+      @media (max-width: 1080px) {
+        .hero,
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .topbar,
+        .panel-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .metric-grid {
+          grid-template-columns: 1fr;
+        }
+
+        button,
+        a.button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">DW</div>
+        <div>
+          <h1>Auditoría de Calidad</h1>
+          <p>Dashboard conectado a la API de Datawrapper</p>
+        </div>
+      </div>
+      <div class="status"><span class="dot"></span> Gráfico oduja conectado</div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="intro panel">
+          <p class="eyebrow">Demo en vivo</p>
+          <h2>Editar datos, publicar y ver el gráfico actualizado.</h2>
+          <p>
+            Cambia los porcentajes de cobertura desde este dashboard. Al publicar,
+            el servidor local guarda el CSV, llama la API de Datawrapper y recarga
+            la página publicada del gráfico.
+          </p>
+        </div>
+
+        <aside class="flow panel" aria-label="Flujo de la demo">
+          <article class="flow-step">
+            <span>1</span>
+            <div>
+              <h3>Editar la tabla</h3>
+              <p>Los valores visibles aquí son los datos del CSV del proyecto.</p>
+            </div>
+          </article>
+          <article class="flow-step">
+            <span>2</span>
+            <div>
+              <h3>Publicar por API</h3>
+              <p>El backend ejecuta <code>PUT /data</code> y <code>POST /publish</code>.</p>
+            </div>
+          </article>
+          <article class="flow-step">
+            <span>3</span>
+            <div>
+              <h3>Ver resultado</h3>
+              <p>El iframe muestra la URL publicada que devuelve Datawrapper.</p>
+            </div>
+          </article>
+        </aside>
+      </section>
+
+      <section class="workspace">
+        <div class="editor panel">
+          <div class="panel-header">
+            <div>
+              <h2>Datos editables</h2>
+              <p class="muted">Modifica los valores y publica el gráfico.</p>
+            </div>
+            <div class="actions">
+              <button class="secondary" id="resetDemo" type="button">Demo</button>
+              <button id="publishData" type="button">Publicar cambios</button>
+            </div>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric">
+              <strong id="avgCoverage">0%</strong>
+              <span>Promedio cobertura</span>
+            </div>
+            <div class="metric">
+              <strong id="goalCount">0/0</strong>
+              <span>Módulos sobre meta</span>
+            </div>
+            <div class="metric">
+              <strong id="riskModule">-</strong>
+              <span>Módulo más crítico</span>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Módulo</th>
+                  <th>Cobertura actual</th>
+                  <th>Meta</th>
+                </tr>
+              </thead>
+              <tbody id="dataRows"></tbody>
+            </table>
+          </div>
+          <p class="message" id="message">Cargando datos...</p>
+        </div>
+
+        <div class="chart panel">
+          <div class="panel-header">
+            <div>
+              <h2>Gráfico publicado</h2>
+              <p class="muted" id="chartCaption">Datawrapper ID: oduja</p>
+            </div>
+            <div class="actions">
+              <button class="secondary" id="refreshChart" type="button">Refrescar</button>
+              <a class="button" id="openChart" href="https://datawrapper.dwcdn.net/oduja/4/" target="_blank" rel="noreferrer">
+                Abrir publicado
+              </a>
+            </div>
+          </div>
+          <div class="frame-wrap">
+            <iframe
+              id="chartFrame"
+              title="Auditoría de Calidad: Cobertura de Pruebas Unitarias"
+              src="https://datawrapper.dwcdn.net/oduja/4/"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const tbody = document.querySelector("#dataRows");
+      const message = document.querySelector("#message");
+      const publishButton = document.querySelector("#publishData");
+      const resetButton = document.querySelector("#resetDemo");
+      const refreshButton = document.querySelector("#refreshChart");
+      const frame = document.querySelector("#chartFrame");
+      const openChart = document.querySelector("#openChart");
+      const chartCaption = document.querySelector("#chartCaption");
+      const avgCoverage = document.querySelector("#avgCoverage");
+      const goalCount = document.querySelector("#goalCount");
+      const riskModule = document.querySelector("#riskModule");
+
+      let publicUrl = "https://datawrapper.dwcdn.net/oduja/4/";
+
+      const demoRows = [
+        { Modulo: "Pasarela_Pagos", "Cobertura_Actual_%": 99, "Meta_Target_%": 90 },
+        { Modulo: "Reportes_Financieros", "Cobertura_Actual_%": 96, "Meta_Target_%": 90 },
+        { Modulo: "Autenticacion_OAuth", "Cobertura_Actual_%": 93, "Meta_Target_%": 85 },
+        { Modulo: "Notificaciones_Push", "Cobertura_Actual_%": 84, "Meta_Target_%": 75 },
+        { Modulo: "Gestion_Inventario", "Cobertura_Actual_%": 82, "Meta_Target_%": 80 },
+        { Modulo: "Motor_Recomendacion", "Cobertura_Actual_%": 69, "Meta_Target_%": 80 },
+      ];
+
+      function setMessage(text, type = "") {
+        message.textContent = text;
+        message.className = `message ${type}`.trim();
+      }
+
+      function asNumber(value) {
+        return Math.max(0, Math.min(100, Number.parseInt(value || 0, 10)));
+      }
+
+      function escapeAttr(value) {
+        return String(value).replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
+      }
+
+      function renderRows(rows) {
+        tbody.innerHTML = "";
+        rows.forEach((row) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><input value="${escapeAttr(row.Modulo)}" aria-label="Módulo" /></td>
+            <td><input type="number" min="0" max="100" value="${escapeAttr(row["Cobertura_Actual_%"])}" aria-label="Cobertura actual" /></td>
+            <td><input type="number" min="0" max="100" value="${escapeAttr(row["Meta_Target_%"])}" aria-label="Meta" /></td>
+          `;
+          tbody.appendChild(tr);
+        });
+        updateMetrics();
+      }
+
+      function collectRows() {
+        return [...tbody.querySelectorAll("tr")].map((tr) => {
+          const inputs = tr.querySelectorAll("input");
+          return {
+            Modulo: inputs[0].value.trim(),
+            "Cobertura_Actual_%": asNumber(inputs[1].value),
+            "Meta_Target_%": asNumber(inputs[2].value),
+          };
+        });
+      }
+
+      function updateMetrics() {
+        const rows = collectRows();
+        if (!rows.length) return;
+        const total = rows.reduce((sum, row) => sum + row["Cobertura_Actual_%"], 0);
+        const goals = rows.filter((row) => row["Cobertura_Actual_%"] >= row["Meta_Target_%"]).length;
+        const riskiest = rows.reduce((worst, row) => {
+          const gap = row["Cobertura_Actual_%"] - row["Meta_Target_%"];
+          const worstGap = worst["Cobertura_Actual_%"] - worst["Meta_Target_%"];
+          return gap < worstGap ? row : worst;
+        }, rows[0]);
+
+        avgCoverage.textContent = `${Math.round(total / rows.length)}%`;
+        goalCount.textContent = `${goals}/${rows.length}`;
+        riskModule.textContent = riskiest.Modulo.replaceAll("_", " ");
+      }
+
+      function refreshChart() {
+        frame.src = `${publicUrl}?cacheBust=${Date.now()}`;
+        openChart.href = publicUrl;
+      }
+
+      async function loadInitialData() {
+        const [configResponse, dataResponse] = await Promise.all([
+          fetch("/api/config"),
+          fetch("/api/data"),
+        ]);
+        const config = await configResponse.json();
+        const data = await dataResponse.json();
+        publicUrl = config.publicUrl || publicUrl;
+        chartCaption.textContent = `Datawrapper ID: ${config.chartId}`;
+        renderRows(data.rows);
+        refreshChart();
+        setMessage("Datos cargados. Puedes editar y publicar.");
+      }
+
+      async function publishData() {
+        publishButton.disabled = true;
+        setMessage("Publicando en Datawrapper...");
+        try {
+          const response = await fetch("/api/publish", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ rows: collectRows() }),
+          });
+          const payload = await response.json();
+          if (!response.ok || !payload.ok) {
+            throw new Error(payload.error || "No se pudo publicar.");
+          }
+          publicUrl = payload.publicUrl || publicUrl;
+          renderRows(payload.rows);
+          refreshChart();
+          setMessage("Publicado. El gráfico de Datawrapper ya fue actualizado.", "ok");
+        } catch (error) {
+          setMessage(error.message, "error");
+        } finally {
+          publishButton.disabled = false;
+        }
+      }
+
+      tbody.addEventListener("input", updateMetrics);
+      publishButton.addEventListener("click", publishData);
+      refreshButton.addEventListener("click", refreshChart);
+      resetButton.addEventListener("click", () => {
+        renderRows(demoRows);
+        setMessage("Valores de demo cargados. Presiona Publicar cambios.");
+      });
+
+      loadInitialData().catch((error) => setMessage(error.message, "error"));
+    </script>
+  </body>
+</html>

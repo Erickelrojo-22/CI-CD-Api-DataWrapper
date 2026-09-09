@@ -1,7 +1,7 @@
 Modulo,Cobertura_Actual_%,Meta_Target_%
 Pasarela_Pagos,97,90
+Reportes_Financieros,95,90
 Autenticacion_OAuth,92,85
-Motor_Recomendacion,75,80
 Notificaciones_Push,82,75
 Gestion_Inventario,80,80
-Reportes_Financieros,95,90
+Motor_Recomendacion,75,80

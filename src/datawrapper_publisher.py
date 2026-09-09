@@ -16,6 +16,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+from urllib.parse import quote
 
 import requests
 
@@ -33,6 +34,21 @@ logger = logging.getLogger(__name__)
 # Constantes
 # ---------------------------------------------------------------------------
 BASE_URL = "https://api.datawrapper.de/v3/charts"
+EMBED_BASE_URL = "https://datawrapper.dwcdn.net"
+ENV_PATH = Path(__file__).resolve().parent.parent / ".env"
+
+
+def load_dotenv() -> None:
+    """Carga variables desde .env si existen y no están definidas en el entorno."""
+    if not ENV_PATH.is_file():
+        return
+
+    for raw_line in ENV_PATH.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip())
 
 
 # ---------------------------------------------------------------------------
@@ -108,6 +124,11 @@ class DatawrapperClient:
         logger.info("URL pública: %s", public_url)
         return result
 
+    def fallback_public_url(self) -> str:
+        """Construye la URL pública estándar del embed si la API no la devuelve."""
+        safe_chart_id = quote(self.chart_id.strip(), safe="")
+        return f"{EMBED_BASE_URL}/{safe_chart_id}/"
+
     # ----- Flujo completo -----
     def run(self, csv_path: str | Path) -> dict:
         """Ejecuta el flujo completo: actualizar datos → republicar gráfico.
@@ -134,11 +155,17 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default="data/cobertura_modulos.csv",
         help="Ruta al archivo CSV con los datos (default: data/cobertura_modulos.csv).",
     )
+    parser.add_argument(
+        "--skip-publish",
+        action="store_true",
+        help="Solo sube los datos. Útil para demostrar que publicar es un paso aparte.",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> None:
     args = _parse_args(argv)
+    load_dotenv()
 
     api_token = os.environ.get("DATAWRAPPER_API_TOKEN", "")
     chart_id = os.environ.get("DATAWRAPPER_CHART_ID", "")
@@ -158,12 +185,26 @@ def main(argv: list[str] | None = None) -> None:
     client = DatawrapperClient(api_token=api_token, chart_id=chart_id)
 
     try:
-        result = client.run(args.csv_path)
-        public_url = result.get("data", {}).get("publicUrl", "N/A")
+        client.update_data(args.csv_path)
+        result = {} if args.skip_publish else client.publish()
+        public_url = (
+            result.get("data", {}).get("publicUrl")
+            if result
+            else client.fallback_public_url()
+        )
+        public_url = public_url or client.fallback_public_url()
+        iframe = (
+            '<iframe title="Datawrapper chart" '
+            f'src="{public_url}" scrolling="no" frameborder="0" '
+            'style="width:0;min-width:100%!important;border:none;" '
+            'height="520"></iframe>'
+        )
         print(f"\n{'='*60}")
-        print(f"  [OK] Grafico actualizado y publicado exitosamente")
+        status = "Datos actualizados" if args.skip_publish else "Grafico actualizado y publicado"
+        print(f"  [OK] {status} exitosamente")
         print(f"  Chart ID : {chart_id}")
         print(f"  URL      : {public_url}")
+        print(f"  Iframe   : {iframe}")
         print(f"{'='*60}\n")
     except FileNotFoundError as exc:
         logger.error(str(exc))
