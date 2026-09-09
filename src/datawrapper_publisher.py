@@ -67,13 +67,18 @@ class DatawrapperClient:
         if not csv_path.is_file():
             raise FileNotFoundError(f"Archivo CSV no encontrado: {csv_path}")
 
-        csv_content = csv_path.read_text(encoding="utf-8")
+        # Leer como bytes, eliminar BOM si existe y normalizar saltos de línea a LF.
+        raw = csv_path.read_bytes()
+        if raw.startswith(b"\xef\xbb\xbf"):
+            raw = raw[3:]
+        csv_bytes = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
         url = f"{BASE_URL}/{self.chart_id}/data"
 
         logger.info("Actualizando datos del gráfico %s …", self.chart_id)
         response = self._session.put(
             url,
-            data=csv_content,
+            data=csv_bytes,
             headers={"Content-Type": "text/csv"},
         )
         response.raise_for_status()

@@ -105,7 +105,7 @@ class TestUpdateData:
         call_args = mock_session.put.call_args
         assert FAKE_CHART_ID in call_args[0][0]
         assert call_args[1]["headers"]["Content-Type"] == "text/csv"
-        assert call_args[1]["data"] == SAMPLE_CSV_CONTENT
+        assert call_args[1]["data"] == SAMPLE_CSV_CONTENT.encode("utf-8")
 
     @patch("datawrapper_publisher.requests.Session")
     def test_update_data_http_error(
