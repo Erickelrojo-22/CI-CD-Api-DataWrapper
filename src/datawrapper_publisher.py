@@ -161,9 +161,9 @@ def main(argv: list[str] | None = None) -> None:
         result = client.run(args.csv_path)
         public_url = result.get("data", {}).get("publicUrl", "N/A")
         print(f"\n{'='*60}")
-        print(f"  ✅ Gráfico actualizado y publicado exitosamente")
-        print(f"  📊 Chart ID : {chart_id}")
-        print(f"  🔗 URL      : {public_url}")
+        print(f"  [OK] Grafico actualizado y publicado exitosamente")
+        print(f"  Chart ID : {chart_id}")
+        print(f"  URL      : {public_url}")
         print(f"{'='*60}\n")
     except FileNotFoundError as exc:
         logger.error(str(exc))
